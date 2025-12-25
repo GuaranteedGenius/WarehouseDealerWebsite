@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 const footerLinks = {
   properties: [
@@ -22,12 +23,14 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <span className="font-display font-bold text-xl">Industrial Realty Partners</span>
+              <Image
+                src="/logo.png"
+                alt="The Warehouse Dealers"
+                width={120}
+                height={40}
+                className="h-12 w-auto rounded-lg"
+              />
+              <span className="font-display font-bold text-xl">The Warehouse Dealers</span>
             </Link>
             <p className="text-gray-400 max-w-md mb-6">
               Your trusted partner for premium warehouse and industrial real estate.
@@ -76,13 +79,13 @@ export default function Footer() {
             <div className="mt-6">
               <h4 className="font-medium mb-2">Contact</h4>
               <p className="text-gray-400 text-sm">
-                <a href="tel:+15551234567" className="hover:text-white transition-colors">
-                  (555) 123-4567
+                <a href="tel:+19095688474" className="hover:text-white transition-colors">
+                  (909) 568-8474
                 </a>
               </p>
               <p className="text-gray-400 text-sm">
-                <a href="mailto:info@industrialrealty.com" className="hover:text-white transition-colors">
-                  info@industrialrealty.com
+                <a href="mailto:hector@thewarehousedealers.com" className="hover:text-white transition-colors">
+                  hector@thewarehousedealers.com
                 </a>
               </p>
             </div>
@@ -93,7 +96,7 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-industrial-800">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-400 text-sm">
-              &copy; {currentYear} Industrial Realty Partners. All rights reserved.
+              &copy; {currentYear} The Warehouse Dealers. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm">
               <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">

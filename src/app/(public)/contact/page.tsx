@@ -3,7 +3,7 @@ import { ContactForm } from '@/components/forms'
 
 export const metadata: Metadata = {
   title: 'Contact Us',
-  description: 'Get in touch with Industrial Realty Partners. We\'re here to help you find the perfect warehouse or industrial property.',
+  description: 'Get in touch with The Warehouse Dealers. We\'re here to help you find the perfect warehouse or industrial property in Southern California.',
 }
 
 export default function ContactPage() {
@@ -43,8 +43,8 @@ export default function ContactPage() {
                     <div>
                       <h3 className="font-semibold text-gray-900">Address</h3>
                       <p className="text-gray-600 mt-1">
-                        123 Industrial Boulevard, Suite 400<br />
-                        Houston, TX 77001
+                        12865 Mountain Ave, Suite B<br />
+                        Chino, CA 91710
                       </p>
                     </div>
                   </div>
@@ -57,8 +57,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">Phone</h3>
-                      <a href="tel:+15551234567" className="text-primary-600 hover:text-primary-700 mt-1 block">
-                        (555) 123-4567
+                      <a href="tel:+19095688474" className="text-primary-600 hover:text-primary-700 mt-1 block">
+                        (909) 568-8474
                       </a>
                     </div>
                   </div>
@@ -71,8 +71,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">Email</h3>
-                      <a href="mailto:info@industrialrealty.com" className="text-primary-600 hover:text-primary-700 mt-1 block">
-                        info@industrialrealty.com
+                      <a href="mailto:hector@thewarehousedealers.com" className="text-primary-600 hover:text-primary-700 mt-1 block">
+                        hector@thewarehousedealers.com
                       </a>
                     </div>
                   </div>
