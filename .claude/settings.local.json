@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(npm install)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(timeout:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker compose:*)",
+      "Bash(powershell.exe -Command \"docker --version\")",
+      "Bash(powershell.exe -Command:*)",
+      "Bash(npx prisma db push)",
+      "Bash(taskkill:*)",
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)",
+      "Bash(curl.exe:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(del \"d:\\\\Repos\\\\WarehouseDealerWebsite\\\\prisma\\\\dev.db\")",
+      "Bash(node -e:*)",
+      "Bash(git -C \"D:\\\\Repos\\\\WarehouseDealerWebsite\" status --porcelain)",
+      "Bash(cmd.exe /c \"del /f /q \\\\?\\\\D:\\\\Repos\\\\WarehouseDealerWebsite\\\\nul\")",
+      "Bash(git -C \"D:\\\\Repos\\\\WarehouseDealerWebsite\" add .gitignore)",
+      "Bash(git -C \"D:\\\\Repos\\\\WarehouseDealerWebsite\" add --all -- \":!nul\")",
+      "Bash(git -C \"D:\\\\Repos\\\\WarehouseDealerWebsite\" status)",
+      "Bash(git -C \"D:\\\\Repos\\\\WarehouseDealerWebsite\" rm:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial commit: Industrial Real Estate website with Supabase\n\n- Next.js 14 App Router with TypeScript and Tailwind CSS\n- Public pages: Homepage, property listings, property details, contact\n- Admin CMS: Dashboard, property management, lead management\n- Authentication with iron-session and bcrypt\n- Prisma ORM configured for Supabase PostgreSQL\n- S3-compatible storage for property images \\(Supabase Storage\\)\n- Form validation with Zod\n- Rate limiting for lead submissions\n- Responsive design with modern UI components\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+    ]
+  }
+}
