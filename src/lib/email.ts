@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer'
-import { Lead, Property, LeadType } from '@prisma/client'
+import { Lead, Property } from '@prisma/client'
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
   },
 })
 
-function getLeadTypeLabel(type: LeadType): string {
+function getLeadTypeLabel(type: string): string {
   switch (type) {
     case 'Contact':
       return 'General Contact'

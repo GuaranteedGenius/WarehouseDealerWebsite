@@ -5,7 +5,7 @@ import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { formatRelativeTime, getLeadTypeLabel } from '@/lib/utils'
 import { StatusBadge, Select, EmptyState, NoLeadsIcon, Modal, Button } from '@/components/ui'
-import { Lead, Property, LeadStatus, LeadType } from '@prisma/client'
+import { Lead, Property } from '@prisma/client'
 
 type LeadWithProperty = Lead & {
   property: { id: string; title: string; slug: string } | null
@@ -26,7 +26,7 @@ export default function LeadsTable({ initialLeads }: LeadsTableProps) {
     return true
   })
 
-  async function updateLeadStatus(leadId: string, status: LeadStatus) {
+  async function updateLeadStatus(leadId: string, status: string) {
     try {
       const res = await fetch(`/api/admin/leads/${leadId}`, {
         method: 'PATCH',
@@ -154,7 +154,7 @@ export default function LeadsTable({ initialLeads }: LeadsTableProps) {
                   <td className="px-6 py-4">
                     <select
                       value={lead.status}
-                      onChange={(e) => updateLeadStatus(lead.id, e.target.value as LeadStatus)}
+                      onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
                       className="text-sm border-0 bg-transparent cursor-pointer focus:ring-0 p-0"
                     >
                       <option value="New">New</option>
@@ -266,8 +266,8 @@ export default function LeadsTable({ initialLeads }: LeadsTableProps) {
                 <select
                   value={selectedLead.status}
                   onChange={(e) => {
-                    updateLeadStatus(selectedLead.id, e.target.value as LeadStatus)
-                    setSelectedLead({ ...selectedLead, status: e.target.value as LeadStatus })
+                    updateLeadStatus(selectedLead.id, e.target.value)
+                    setSelectedLead({ ...selectedLead, status: e.target.value })
                   }}
                   className="text-sm border border-gray-300 rounded-lg px-3 py-1.5"
                 >

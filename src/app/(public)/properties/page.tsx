@@ -4,7 +4,6 @@ import { prisma } from '@/lib/db'
 import { PropertyCard, PropertyFilters } from '@/components/properties'
 import { Pagination, PageLoader, EmptyState, NoPropertiesIcon } from '@/components/ui'
 import { parseSquareFeetRange } from '@/lib/utils'
-import { PropertyStatus, LeaseOrSale } from '@prisma/client'
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
@@ -26,10 +25,10 @@ async function getProperties(searchParams: PropertiesPageProps['searchParams']) 
   const { min: minSqft, max: maxSqft } = parseSquareFeetRange(searchParams.size || '')
 
   const where = {
-    status: 'Available' as PropertyStatus,
+    status: 'Available',
     archived: false,
     ...(searchParams.city && { city: searchParams.city }),
-    ...(searchParams.type && { leaseOrSale: searchParams.type as LeaseOrSale }),
+    ...(searchParams.type && { leaseOrSale: searchParams.type }),
     ...(minSqft && { squareFeet: { gte: minSqft } }),
     ...(maxSqft && { squareFeet: { lte: maxSqft } }),
     ...(searchParams.search && {
