@@ -5,7 +5,7 @@ import PropertyForm from '../PropertyForm'
 export const dynamic = 'force-dynamic'
 
 interface EditPropertyPageProps {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 async function getProperty(id: string) {
@@ -17,7 +17,8 @@ async function getProperty(id: string) {
 }
 
 export default async function EditPropertyPage({ params }: EditPropertyPageProps) {
-  const property = await getProperty(params.id)
+  const { id } = await params
+  const property = await getProperty(id)
 
   if (!property) {
     notFound()

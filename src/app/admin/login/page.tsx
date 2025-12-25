@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { Input, Button } from '@/components/ui'
 
@@ -93,9 +94,9 @@ export default function AdminLoginPage() {
 
         {/* Back Link */}
         <div className="text-center mt-6">
-          <a href="/" className="text-gray-400 hover:text-white text-sm transition-colors">
+          <Link href="/" className="text-gray-400 hover:text-white text-sm transition-colors">
             &larr; Back to website
-          </a>
+          </Link>
         </div>
       </div>
     </div>

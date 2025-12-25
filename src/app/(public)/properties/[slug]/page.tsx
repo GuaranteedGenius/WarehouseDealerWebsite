@@ -11,7 +11,7 @@ import PropertyDetailClient from './PropertyDetailClient'
 export const dynamic = 'force-dynamic'
 
 interface PropertyPageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 async function getProperty(slug: string) {
@@ -23,7 +23,8 @@ async function getProperty(slug: string) {
 }
 
 export async function generateMetadata({ params }: PropertyPageProps): Promise<Metadata> {
-  const property = await getProperty(params.slug)
+  const { slug } = await params
+  const property = await getProperty(slug)
 
   if (!property) {
     return { title: 'Property Not Found' }
@@ -41,7 +42,8 @@ export async function generateMetadata({ params }: PropertyPageProps): Promise<M
 }
 
 export default async function PropertyPage({ params }: PropertyPageProps) {
-  const property = await getProperty(params.slug)
+  const { slug } = await params
+  const property = await getProperty(slug)
 
   if (!property) {
     notFound()

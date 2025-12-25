@@ -5,7 +5,7 @@ import { leadStatusUpdateSchema } from '@/lib/validations'
 import { ZodError } from 'zod'
 
 interface RouteParams {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export async function GET(request: Request, { params }: RouteParams) {
@@ -14,8 +14,9 @@ export async function GET(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const { id } = await params
   const lead = await prisma.lead.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       property: true,
     },
@@ -35,13 +36,14 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   }
 
   try {
+    const { id } = await params
     const body = await request.json()
 
     // Validate
     const { status } = leadStatusUpdateSchema.parse(body)
 
     const lead = await prisma.lead.update({
-      where: { id: params.id },
+      where: { id },
       data: { status },
     })
 
@@ -63,8 +65,9 @@ export async function DELETE(request: Request, { params }: RouteParams) {
   }
 
   try {
+    const { id } = await params
     await prisma.lead.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })

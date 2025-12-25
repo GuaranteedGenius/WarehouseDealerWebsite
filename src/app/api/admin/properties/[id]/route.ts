@@ -6,7 +6,7 @@ import { generateSlug } from '@/lib/utils'
 import { ZodError } from 'zod'
 
 interface RouteParams {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export async function GET(request: Request, { params }: RouteParams) {
@@ -15,8 +15,9 @@ export async function GET(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const { id } = await params
   const property = await prisma.property.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: { images: { orderBy: { sortOrder: 'asc' } } },
   })
 
@@ -34,6 +35,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
   }
 
   try {
+    const { id } = await params
     const body = await request.json()
 
     // Validate
@@ -41,7 +43,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     // Check if property exists
     const existingProperty = await prisma.property.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!existingProperty) {
@@ -53,7 +55,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
     if (validatedData.title && validatedData.title !== existingProperty.title) {
       const existingSlugs = (
         await prisma.property.findMany({
-          where: { id: { not: params.id } },
+          where: { id: { not: id } },
           select: { slug: true },
         })
       ).map((p) => p.slug)
@@ -63,7 +65,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     // Update property
     const property = await prisma.property.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...validatedData,
         slug,
@@ -107,10 +109,11 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   }
 
   try {
+    const { id } = await params
     const body = await request.json()
 
     const property = await prisma.property.update({
-      where: { id: params.id },
+      where: { id },
       data: body,
     })
 
@@ -128,8 +131,9 @@ export async function DELETE(request: Request, { params }: RouteParams) {
   }
 
   try {
+    const { id } = await params
     await prisma.property.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })

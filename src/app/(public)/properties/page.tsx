@@ -13,11 +13,13 @@ export const metadata: Metadata = {
   description: 'Browse our selection of premium warehouse and industrial properties available for lease or sale.',
 }
 
+type SearchParams = { [key: string]: string | undefined }
+
 interface PropertiesPageProps {
-  searchParams: { [key: string]: string | undefined }
+  searchParams: Promise<SearchParams>
 }
 
-async function getProperties(searchParams: PropertiesPageProps['searchParams']) {
+async function getProperties(searchParams: SearchParams) {
   const page = parseInt(searchParams.page || '1')
   const limit = 9
   const skip = (page - 1) * limit
@@ -69,7 +71,7 @@ async function getCities() {
   return cities.map((c) => c.city)
 }
 
-function PropertiesGrid({ searchParams }: PropertiesPageProps) {
+function PropertiesGrid({ searchParams }: { searchParams: SearchParams }) {
   return (
     <Suspense fallback={<PageLoader />}>
       <PropertiesGridContent searchParams={searchParams} />
@@ -77,7 +79,7 @@ function PropertiesGrid({ searchParams }: PropertiesPageProps) {
   )
 }
 
-async function PropertiesGridContent({ searchParams }: PropertiesPageProps) {
+async function PropertiesGridContent({ searchParams }: { searchParams: SearchParams }) {
   const { properties, total, page, totalPages } = await getProperties(searchParams)
 
   if (properties.length === 0) {
@@ -163,7 +165,10 @@ function PaginationWrapper({ currentPage, totalPages }: { currentPage: number; t
 }
 
 export default async function PropertiesPage({ searchParams }: PropertiesPageProps) {
-  const cities = await getCities()
+  const [cities, resolvedSearchParams] = await Promise.all([
+    getCities(),
+    searchParams,
+  ])
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -184,7 +189,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
         </Suspense>
 
         {/* Properties Grid */}
-        <PropertiesGrid searchParams={searchParams} />
+        <PropertiesGrid searchParams={resolvedSearchParams} />
       </div>
     </div>
   )
