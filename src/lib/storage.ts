@@ -61,16 +61,6 @@ export async function uploadFile(
   const ext = path.extname(originalName)
   const key = `properties/${uuidv4()}${ext}`
 
-  // Log storage config for debugging (remove in production)
-  console.log('Storage config:', {
-    USE_S3,
-    isSupabase,
-    endpoint: process.env.STORAGE_ENDPOINT ? 'set' : 'not set',
-    bucket: BUCKET || 'not set',
-    hasAccessKey: !!process.env.STORAGE_ACCESS_KEY,
-    hasSecretKey: !!process.env.STORAGE_SECRET_KEY,
-  })
-
   if (USE_S3 && s3Client) {
     try {
       await s3Client.send(
@@ -85,14 +75,12 @@ export async function uploadFile(
       )
 
       const url = getPublicUrl(key)
-      console.log('Upload successful:', { key, url })
       return { url, key }
     } catch (s3Error) {
       console.error('S3 upload error:', s3Error)
       throw new Error(`S3 upload failed: ${s3Error instanceof Error ? s3Error.message : 'Unknown error'}`)
     }
   } else {
-    // Local storage fallback - won't work on Vercel serverless
     throw new Error('S3 storage not configured. Please set STORAGE_ENDPOINT, STORAGE_BUCKET, STORAGE_ACCESS_KEY, and STORAGE_SECRET_KEY environment variables.')
   }
 }

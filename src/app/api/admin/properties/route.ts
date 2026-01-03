@@ -32,6 +32,18 @@ export async function POST(request: Request) {
     // Validate
     const validatedData = propertySchema.parse(body)
 
+    // Check that all images have valid URLs (were successfully uploaded)
+    const images = body.images as Array<{ id: string; url: string; sortOrder: number }> | undefined
+    if (images && images.length > 0) {
+      const failedImages = images.filter(img => !img.url || img.url.trim() === '')
+      if (failedImages.length > 0) {
+        return NextResponse.json({
+          error: 'Some images failed to upload. Please remove failed images and try again.',
+          errors: { images: 'One or more images failed to upload' }
+        }, { status: 400 })
+      }
+    }
+
     // Generate unique slug
     const existingSlugs = (
       await prisma.property.findMany({
@@ -41,24 +53,42 @@ export async function POST(request: Request) {
 
     const slug = generateSlug(validatedData.title, existingSlugs)
 
-    // Create property
-    const property = await prisma.property.create({
-      data: {
-        ...validatedData,
-        slug,
-        availableDate: validatedData.availableDate ? new Date(validatedData.availableDate) : null,
-      },
-    })
+    // Use a transaction to ensure property and images are created together
+    const property = await prisma.$transaction(async (tx) => {
+      // Create property
+      const newProperty = await tx.property.create({
+        data: {
+          ...validatedData,
+          slug,
+          availableDate: validatedData.availableDate ? new Date(validatedData.availableDate) : null,
+        },
+      })
 
-    // Update image associations if provided
-    if (body.images && Array.isArray(body.images)) {
-      for (const img of body.images) {
-        await prisma.propertyImage.update({
-          where: { id: img.id },
-          data: { propertyId: property.id, sortOrder: img.sortOrder },
-        })
+      // Create or update image associations if provided
+      if (images && images.length > 0) {
+        for (const img of images) {
+          // Check if this is a temp ID (new image) or existing image
+          if (img.id.startsWith('temp-')) {
+            // Create new image record
+            await tx.propertyImage.create({
+              data: {
+                url: img.url,
+                propertyId: newProperty.id,
+                sortOrder: img.sortOrder,
+              },
+            })
+          } else {
+            // Update existing image
+            await tx.propertyImage.update({
+              where: { id: img.id },
+              data: { propertyId: newProperty.id, sortOrder: img.sortOrder },
+            })
+          }
+        }
       }
-    }
+
+      return newProperty
+    })
 
     return NextResponse.json(property, { status: 201 })
   } catch (error) {

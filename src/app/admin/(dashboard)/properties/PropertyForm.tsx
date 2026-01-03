@@ -33,6 +33,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [images, setImages] = useState<PropertyImage[]>(property?.images || [])
   const [uploading, setUploading] = useState(false)
+  const [uploadErrors, setUploadErrors] = useState<string[]>([])
   const [highlights, setHighlights] = useState<string[]>(() => {
     const parsed = property?.highlights ? parseHighlights(property.highlights) : []
     return parsed.length > 0 ? parsed : ['']
@@ -44,8 +45,12 @@ export default function PropertyForm({ property }: PropertyFormProps) {
     if (acceptedFiles.length === 0) return
 
     setUploading(true)
-    try {
-      for (const file of acceptedFiles) {
+    setUploadErrors([])
+    const newErrors: string[] = []
+    let successCount = 0
+
+    for (const file of acceptedFiles) {
+      try {
         const formData = new FormData()
         formData.append('file', file)
         if (property?.id) {
@@ -57,16 +62,29 @@ export default function PropertyForm({ property }: PropertyFormProps) {
           body: formData,
         })
 
-        if (!res.ok) throw new Error('Upload failed')
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}))
+          const errorMsg = errorData.details || errorData.error || 'Upload failed'
+          newErrors.push(`${file.name}: ${errorMsg}`)
+          continue
+        }
 
         const newImage = await res.json()
         setImages((prev) => [...prev, newImage])
+        successCount++
+      } catch (error) {
+        newErrors.push(`${file.name}: Network error`)
       }
-      toast.success('Images uploaded successfully')
-    } catch (error) {
-      toast.error('Failed to upload images')
-    } finally {
-      setUploading(false)
+    }
+
+    setUploading(false)
+
+    if (newErrors.length > 0) {
+      setUploadErrors(newErrors)
+      toast.error(`${newErrors.length} image(s) failed to upload`)
+    }
+    if (successCount > 0) {
+      toast.success(`${successCount} image(s) uploaded successfully`)
     }
   }, [property?.id])
 
@@ -80,8 +98,23 @@ export default function PropertyForm({ property }: PropertyFormProps) {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setLoading(true)
     setErrors({})
+
+    // Check if still uploading
+    if (uploading) {
+      toast.error('Please wait for images to finish uploading')
+      return
+    }
+
+    // Check for any images without URLs (failed uploads)
+    const imagesWithoutUrl = images.filter(img => !img.url)
+    if (imagesWithoutUrl.length > 0) {
+      toast.error('Some images failed to upload. Please remove them and try again.')
+      setErrors({ images: 'Remove failed images before saving' })
+      return
+    }
+
+    setLoading(true)
 
     const formData = new FormData(e.currentTarget)
 
@@ -103,7 +136,8 @@ export default function PropertyForm({ property }: PropertyFormProps) {
       highlights: highlights.filter((h) => h.trim() !== ''),
       status: formData.get('status') as string,
       featured: formData.get('featured') === 'on',
-      images: images.map((img, index) => ({ id: img.id, sortOrder: index })),
+      // Include full image data with URL for new properties
+      images: images.map((img, index) => ({ id: img.id, url: img.url, sortOrder: index })),
     }
 
     try {
@@ -352,6 +386,24 @@ export default function PropertyForm({ property }: PropertyFormProps) {
       <Card className="p-6">
         <h2 className="font-display font-semibold text-lg text-gray-900 mb-6">Property Images</h2>
 
+        {/* Upload Errors */}
+        {uploadErrors.length > 0 && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="font-medium text-red-800 mb-2">Some uploads failed:</p>
+            <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
+              {uploadErrors.map((err, i) => (
+                <li key={i}>{err}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {errors.images && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-700">{errors.images}</p>
+          </div>
+        )}
+
         {/* Dropzone */}
         <div
           {...getRootProps()}
@@ -432,8 +484,8 @@ export default function PropertyForm({ property }: PropertyFormProps) {
         <Button type="button" variant="ghost" onClick={() => router.back()}>
           Cancel
         </Button>
-        <Button type="submit" loading={loading}>
-          {isEdit ? 'Save Changes' : 'Create Property'}
+        <Button type="submit" loading={loading} disabled={uploading}>
+          {uploading ? 'Uploading Images...' : isEdit ? 'Save Changes' : 'Create Property'}
         </Button>
       </div>
     </form>
