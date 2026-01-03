@@ -31,7 +31,9 @@
       "Bash(dir /s /b \"D:\\\\Repos\\\\WarehouseDealerWebsite\\\\*.png\")",
       "Bash(dir \"C:\\\\Users\\\\shawn\\\\AppData\\\\Local\\\\Temp\\\\claude\" /s /b)",
       "Bash(copy \"C:\\\\Users\\\\shawn\\\\Pictures\\\\Screenshots\\\\Screenshot 2025-12-25 002557.png\" \"D:\\\\Repos\\\\WarehouseDealerWebsite\\\\public\\\\logo.png\")",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }

@@ -61,29 +61,39 @@ export async function uploadFile(
   const ext = path.extname(originalName)
   const key = `properties/${uuidv4()}${ext}`
 
+  // Log storage config for debugging (remove in production)
+  console.log('Storage config:', {
+    USE_S3,
+    isSupabase,
+    endpoint: process.env.STORAGE_ENDPOINT ? 'set' : 'not set',
+    bucket: BUCKET || 'not set',
+    hasAccessKey: !!process.env.STORAGE_ACCESS_KEY,
+    hasSecretKey: !!process.env.STORAGE_SECRET_KEY,
+  })
+
   if (USE_S3 && s3Client) {
-    await s3Client.send(
-      new PutObjectCommand({
-        Bucket: BUCKET,
-        Key: key,
-        Body: file,
-        ContentType: contentType,
-        // Supabase doesn't support ACL, bucket must be set to public in dashboard
-        ...(isSupabase ? {} : { ACL: 'public-read' }),
-      })
-    )
+    try {
+      await s3Client.send(
+        new PutObjectCommand({
+          Bucket: BUCKET,
+          Key: key,
+          Body: file,
+          ContentType: contentType,
+          // Supabase doesn't support ACL, bucket must be set to public in dashboard
+          ...(isSupabase ? {} : { ACL: 'public-read' }),
+        })
+      )
 
-    const url = getPublicUrl(key)
-    return { url, key }
+      const url = getPublicUrl(key)
+      console.log('Upload successful:', { key, url })
+      return { url, key }
+    } catch (s3Error) {
+      console.error('S3 upload error:', s3Error)
+      throw new Error(`S3 upload failed: ${s3Error instanceof Error ? s3Error.message : 'Unknown error'}`)
+    }
   } else {
-    await ensureLocalDir()
-    const localPath = path.join(LOCAL_UPLOAD_DIR, key.replace('properties/', ''))
-    const dir = path.dirname(localPath)
-    await fs.mkdir(dir, { recursive: true })
-    await fs.writeFile(localPath, file)
-
-    const url = `/uploads/${key.replace('properties/', '')}`
-    return { url, key }
+    // Local storage fallback - won't work on Vercel serverless
+    throw new Error('S3 storage not configured. Please set STORAGE_ENDPOINT, STORAGE_BUCKET, STORAGE_ACCESS_KEY, and STORAGE_SECRET_KEY environment variables.')
   }
 }
 
